@@ -8,7 +8,7 @@
 # == Variables
 #
 # This is a list of variables that must be set for each operating system.
-# 
+#
 # [libvirt_package]
 #   Package(s) for installing libvirt.
 # [libvirt_version]
@@ -46,8 +46,9 @@ class libvirt::params {
       $libvirt_config_dir = "/etc/libvirt"
       $libvirtd_config_file = "${libvirt_config_dir}/libvirtd.conf"
       $qemu_config_file = "${libvirt_config_dir}/qemu.conf"
+      $additional_packages = []
     }
-    'Fedora', 'CentOS': {
+    'Fedora', 'CentOS', 'Scientific': {
       $libvirt_package = "libvirt"
       $libvirt_version = "installed"
       $libvirt_service = "libvirtd"
@@ -56,6 +57,9 @@ class libvirt::params {
       $libvirt_config_dir = "/etc/libvirt"
       $libvirtd_config_file = "${libvirt_config_dir}/libvirtd.conf"
       $qemu_config_file = "${libvirt_config_dir}/qemu.conf"
+      $additional_packages = [ 'bridge-utils', 'tunctl', 'libvirt-devel',
+                               'libvirt-python', 'qemu-img', 'qemu-kvm',
+                               'qemu-kvm-tools' ]
     }
     default: {
       fail("Operating system ${operatingsystem} is not supported")

@@ -37,7 +37,7 @@
 # == Examples
 #
 # Default configuration:
-#     
+#
 #     class { "libvirt": }
 #
 # Custom libvirtd configuration:
@@ -70,16 +70,21 @@ class libvirt (
   $config_dir = $libvirt::params::libvirt_config_dir,
   $libvirtd_config_file = $libvirt::params::libvirtd_config_file,
   $qemu_config_file = $libvirt::params::qemu_config_file,
-  $qemu_config = undef
-
-  ) inherits libvirt::params {
+  $qemu_config = undef,
+  $additional_packages = $libvirt::params::additional_packages,
+) inherits libvirt::params {
 
   ##############################
   # Base packages and service  #
   ##############################
-  package { $package:
-    ensure => $version
-  }
+  ensure_packages( [ $package ], { ensure => $version } )
+
+  ##############################
+  # Additional packages if any #
+  ##############################
+  validate_array($additional_packages)
+  ensure_packages( $additional_packages )
+
   service { $service:
     ensure => running,
     enable => true,
@@ -129,9 +134,11 @@ class libvirt (
   create_resources("libvirt::libvirtd_config", $libvirtd_config)
 
   # Some minor defaults. These may need to differ per OS in the future.
-  libvirt::libvirtd_config { ["auth_unix_ro", "auth_unix_rw"]: value => "none" }
-  libvirt::libvirtd_config { "unix_sock_group": value => $group }
-  libvirt::libvirtd_config { "unix_sock_rw_perms": value => "0770" }
+  # Commenting these out... leaving here for examples, but each profile
+  # really should take care of these, not the module itself
+  #libvirt::libvirtd_config { ["auth_unix_ro", "auth_unix_rw"]: value => "none" }
+  #libvirt::libvirtd_config { "unix_sock_group": value => $group }
+  #libvirt::libvirtd_config { "unix_sock_rw_perms": value => "0770" }
 
   ####################
   # qemu.conf Config #
